@@ -1,26 +1,18 @@
 package com.example.demorequest.entity;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Request {
+    private Long id;
+    private String description;
+    private Status status;
+    private Set<Comment> commentSet = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name="description",nullable = false)
-    private String description;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50, nullable = false)
-    private Status status;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "request_parent")
-    private List<Comment> commentList;
-
     public Long getId() {
         return id;
     }
@@ -29,6 +21,7 @@ public class Request {
         this.id = id;
     }
 
+    @Column(name = "description", nullable = false)
     public String getDescription() {
         return description;
     }
@@ -37,6 +30,8 @@ public class Request {
         this.description = description;
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
     public Status getStatus() {
         return status;
     }
@@ -45,11 +40,13 @@ public class Request {
         this.status = status;
     }
 
-    public List<Comment> getCommentList() {
-        return commentList;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "request_id")
+    public Set<Comment> getCommentSet() {
+        return commentSet;
     }
 
-    public void setCommentList(List<Comment> commentList) {
-        this.commentList = commentList;
+    public void setCommentSet(Set<Comment> commentSet) {
+        this.commentSet = commentSet;
     }
 }

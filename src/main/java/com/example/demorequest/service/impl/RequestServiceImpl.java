@@ -3,6 +3,7 @@ package com.example.demorequest.service.impl;
 import com.example.demorequest.entity.Comment;
 import com.example.demorequest.entity.Request;
 import com.example.demorequest.entity.Status;
+import com.example.demorequest.repository.CommentRepository;
 import com.example.demorequest.repository.RequestRepository;
 import com.example.demorequest.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RequestServiceImpl implements RequestService {
 
     @Autowired
     RequestRepository requestRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
 
     @Override
     public Request createNewRequest(String description) {
@@ -29,7 +33,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public boolean updateStatus(Long id, Status status) {
         Optional<Request> request = requestRepository.findById(id);
-        if(request.isPresent()){
+        if (request.isPresent()) {
             request.get().setStatus(status);
             requestRepository.save(request.get());
             return true;
@@ -41,10 +45,11 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public boolean addComment(Long idRequest, String textComment) {
         Optional<Request> request = requestRepository.findById(idRequest);
-        if(request.isPresent()){
+        if (request.isPresent()) {
             Comment comment = new Comment();
             comment.setText(textComment);
-            requestRepository.save(request.get());
+            request.get().getCommentSet().add(comment);
+            requestRepository.saveAndFlush(request.get());
             return true;
         } else {
             return false;
@@ -64,9 +69,9 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public boolean deleteRequest(Long id) {
         Optional<Request> request = requestRepository.findById(id);
-        if(request.isPresent()){
-           requestRepository.delete(request.get());
-           return true;
+        if (request.isPresent()) {
+            requestRepository.delete(request.get());
+            return true;
         } else {
             return false;
         }

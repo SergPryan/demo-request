@@ -3,6 +3,8 @@ package com.example.demorequest.controller;
 import com.example.demorequest.entity.Request;
 import com.example.demorequest.entity.Status;
 import com.example.demorequest.service.RequestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +18,16 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/request")
 public class RequestController {
-    
+
+    private static Logger log = LoggerFactory.getLogger(RequestController.class);
+
     @Autowired
     RequestService requestService;
 
     /**
      * Создание новой заявки.
      */
-    @PostMapping(path = "/new", consumes = "application/json")
+    @PostMapping
     public ResponseEntity createRequest(@RequestBody Map<String, String> json) {
         if (!json.containsKey("description")) {
             return ResponseEntity.badRequest().build();
@@ -36,7 +40,7 @@ public class RequestController {
     /**
      * Обновление поля статус
      */
-    @PostMapping(path = "/update_status", consumes = "application/json")
+    @PostMapping(path = "/update_status")
     public ResponseEntity updateStatus(@RequestBody Map<String, String> json) {
         try {
             Long id = Long.valueOf(json.get("id"));
@@ -48,6 +52,7 @@ public class RequestController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
+            log.error("update_status bad request", e);
             return ResponseEntity.badRequest().build();
         }
     }
@@ -55,7 +60,7 @@ public class RequestController {
     /**
      * Добавления комментария к заявке
      */
-    @PostMapping(path = "/comment_add", consumes = "application/json")
+    @PostMapping(path = "/comment_add")
     public ResponseEntity addComment(@RequestBody Map<String, String> json) {
         try {
             Long id = Long.valueOf(json.get("id"));
@@ -67,6 +72,7 @@ public class RequestController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
+            log.error("comment_add bad request", e);
             return ResponseEntity.badRequest().build();
         }
 
@@ -75,7 +81,7 @@ public class RequestController {
     /**
      * Получение заявки
      */
-    @GetMapping(path = "/{id}", consumes = "application/json")
+    @GetMapping(path = "/{id}")
     public ResponseEntity getRequest(@PathVariable Long id) {
         Optional<Request> request = requestService.getRequest(id);
         if (request.isPresent()) {
@@ -89,7 +95,7 @@ public class RequestController {
     /**
      * Получение списка заявок
      */
-    @GetMapping(path = "/", consumes = "application/json")
+    @GetMapping(path = "/")
     @ResponseBody
     public Page<Request> getRequestPagination(@RequestBody Pageable pageable) {
         return requestService.getRequestPagination(pageable);
@@ -99,19 +105,20 @@ public class RequestController {
     /**
      * Удаление заявки
      */
-    @DeleteMapping(path = "/delete_request", consumes = "application/json")
+    @DeleteMapping(path = "/delete_request")
     public ResponseEntity deleteRequest(@RequestBody Map<String, String> json) {
-         try {
-             Long id = Long.valueOf(json.get("id"));
-             boolean result = requestService.deleteRequest(id);
-             if(result){
-                 return ResponseEntity.ok().build();
-             } else {
-                 return ResponseEntity.notFound().build();
-             }
-         }catch (Exception e){
-             return ResponseEntity.badRequest().build();
-         }
+        try {
+            Long id = Long.valueOf(json.get("id"));
+            boolean result = requestService.deleteRequest(id);
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("delete_request bad request",e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 

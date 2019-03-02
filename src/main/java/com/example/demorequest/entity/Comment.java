@@ -1,16 +1,15 @@
 package com.example.demorequest.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Comment {
-
-    @Id
     private Long id;
-
-    @Column(nullable = false)
     private String text;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
@@ -19,6 +18,7 @@ public class Comment {
         this.id = id;
     }
 
+    @Column(nullable = false)
     public String getText() {
         return text;
     }
@@ -27,4 +27,17 @@ public class Comment {
         this.text = text;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment comment = (Comment) o;
+        return Objects.equals(id, comment.id) &&
+                Objects.equals(text, comment.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, text);
+    }
 }

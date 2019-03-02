@@ -11,9 +11,7 @@
             <column name="text" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="request_parent" type="bigint">
-                <constraints nullable="false"/>
-            </column>
+            <column name="request_id" type="bigint"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
