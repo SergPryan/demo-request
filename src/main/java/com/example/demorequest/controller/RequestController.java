@@ -95,9 +95,9 @@ public class RequestController {
     /**
      * Получение списка заявок
      */
-    @GetMapping(path = "/")
+    @GetMapping(path = "/pagination")
     @ResponseBody
-    public Page<Request> getRequestPagination(@RequestBody Pageable pageable) {
+    public Page<Request> getRequestPagination(Pageable pageable) {
         return requestService.getRequestPagination(pageable);
     }
 
