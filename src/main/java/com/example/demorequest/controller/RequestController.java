@@ -1,41 +1,118 @@
 package com.example.demorequest.controller;
 
-import com.example.demorequest.entity.Comment;
 import com.example.demorequest.entity.Request;
 import com.example.demorequest.entity.Status;
-import com.example.demorequest.repository.RequestRepository;
+import com.example.demorequest.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/request")
 public class RequestController {
-
+    
     @Autowired
-    RequestRepository requestRepository;
+    RequestService requestService;
+
+    /**
+     * Создание новой заявки.
+     */
+    @PostMapping(path = "/new", consumes = "application/json")
+    public ResponseEntity createRequest(@RequestBody Map<String, String> json) {
+        if (!json.containsKey("description")) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            Request request = requestService.createNewRequest(json.get("description"));
+            return ResponseEntity.ok(request);
+        }
+    }
+
+    /**
+     * Обновление поля статус
+     */
+    @PostMapping(path = "/update_status", consumes = "application/json")
+    public ResponseEntity updateStatus(@RequestBody Map<String, String> json) {
+        try {
+            Long id = Long.valueOf(json.get("id"));
+            Status status = Status.valueOf(json.get("status"));
+            boolean result = requestService.updateStatus(id, status);
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Добавления комментария к заявке
+     */
+    @PostMapping(path = "/comment_add", consumes = "application/json")
+    public ResponseEntity addComment(@RequestBody Map<String, String> json) {
+        try {
+            Long id = Long.valueOf(json.get("id"));
+            String comment = json.get("comment");
+            boolean result = requestService.addComment(id, comment);
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
+
+    /**
+     * Получение заявки
+     */
+    @GetMapping(path = "/{id}", consumes = "application/json")
+    public ResponseEntity getRequest(@PathVariable Long id) {
+        Optional<Request> request = requestService.getRequest(id);
+        if (request.isPresent()) {
+            return ResponseEntity.ok(request.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
-    @GetMapping
+    /**
+     * Получение списка заявок
+     */
+    @GetMapping(path = "/", consumes = "application/json")
     @ResponseBody
-    public Map<String,String> updateRequest(){
-        Request request = new Request();
-        request.setDescription("asdasd");
-        request.setStatus(Status.NEW);
-        requestRepository.save(request);
-        Comment comment = new Comment();
-
-
-        Map<String,String> map = new HashMap<>();
-        map.put("result","ok");
-        return map;
+    public Page<Request> getRequestPagination(@RequestBody Pageable pageable) {
+        return requestService.getRequestPagination(pageable);
     }
 
-    @PostMapping
-    public void createRequest(@RequestBody Request request){
 
+    /**
+     * Удаление заявки
+     */
+    @DeleteMapping(path = "/delete_request", consumes = "application/json")
+    public ResponseEntity deleteRequest(@RequestBody Map<String, String> json) {
+         try {
+             Long id = Long.valueOf(json.get("id"));
+             boolean result = requestService.deleteRequest(id);
+             if(result){
+                 return ResponseEntity.ok().build();
+             } else {
+                 return ResponseEntity.notFound().build();
+             }
+         }catch (Exception e){
+             return ResponseEntity.badRequest().build();
+         }
     }
+
+
 }
