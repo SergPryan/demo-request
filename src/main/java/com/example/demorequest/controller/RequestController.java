@@ -29,6 +29,7 @@ public class RequestController {
      */
     @PostMapping
     public ResponseEntity createRequest(@RequestBody Map<String, String> json) {
+        log.info("create reqquest - " + json);
         if (!json.containsKey("description")) {
             return ResponseEntity.badRequest().build();
         } else {
@@ -42,6 +43,7 @@ public class RequestController {
      */
     @PostMapping(path = "/update_status")
     public ResponseEntity updateStatus(@RequestBody Map<String, String> json) {
+        log.info("update status - " + json);
         try {
             Long id = Long.valueOf(json.get("id"));
             Status status = Status.valueOf(json.get("status"));
@@ -62,6 +64,7 @@ public class RequestController {
      */
     @PostMapping(path = "/comment_add")
     public ResponseEntity addComment(@RequestBody Map<String, String> json) {
+        log.info("add comment - " + json);
         try {
             Long id = Long.valueOf(json.get("id"));
             String comment = json.get("comment");
@@ -83,6 +86,7 @@ public class RequestController {
      */
     @GetMapping(path = "/{id}")
     public ResponseEntity getRequest(@PathVariable Long id) {
+        log.info("get request, id -  " + id);
         Optional<Request> request = requestService.getRequest(id);
         if (request.isPresent()) {
             return ResponseEntity.ok(request.get());
@@ -98,6 +102,7 @@ public class RequestController {
     @GetMapping(path = "/pagination")
     @ResponseBody
     public Page<Request> getRequestPagination(Pageable pageable) {
+        log.info(" get reqiest pagination - " + pageable);
         return requestService.getRequestPagination(pageable);
     }
 
@@ -107,6 +112,7 @@ public class RequestController {
      */
     @DeleteMapping(path = "/delete_request")
     public ResponseEntity deleteRequest(@RequestBody Map<String, String> json) {
+        log.info("delete request - " + json);
         try {
             Long id = Long.valueOf(json.get("id"));
             boolean result = requestService.deleteRequest(id);
@@ -116,7 +122,7 @@ public class RequestController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            log.error("delete_request bad request",e);
+            log.error("delete_request bad request", e);
             return ResponseEntity.badRequest().build();
         }
     }

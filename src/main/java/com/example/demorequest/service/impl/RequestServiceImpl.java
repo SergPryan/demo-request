@@ -3,7 +3,6 @@ package com.example.demorequest.service.impl;
 import com.example.demorequest.entity.Comment;
 import com.example.demorequest.entity.Request;
 import com.example.demorequest.entity.Status;
-import com.example.demorequest.repository.CommentRepository;
 import com.example.demorequest.repository.RequestRepository;
 import com.example.demorequest.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +17,6 @@ public class RequestServiceImpl implements RequestService {
 
     @Autowired
     RequestRepository requestRepository;
-
-    @Autowired
-    CommentRepository commentRepository;
 
     @Override
     public Request createNewRequest(String description) {
